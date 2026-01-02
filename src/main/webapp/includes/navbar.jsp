@@ -139,7 +139,7 @@
                         String nama = currentUser.getName();
                         String inisial = nama.substring(0, 1).toUpperCase();
                         if(nama.length() > 15) { nama = nama.substring(0, 15) + "..."; }
-                %>
+                %> 
 
                 <li class="nav-item dropdown ms-lg-3 user-dropdown">
                     <a class="nav-link dropdown-toggle user-profile-link d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">

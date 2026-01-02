@@ -10,7 +10,7 @@ public class User {
     private String address;
 
     public User() {}
-
+ 
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 

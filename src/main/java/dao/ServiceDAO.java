@@ -6,7 +6,7 @@ import util.KoneksiDB;
 import model.Service;
 
 public class ServiceDAO {
-    
+     
     public List<Service> getAllServices() {
         List<Service> list = new ArrayList<>();
         

@@ -3,7 +3,7 @@ package model;
 public class Service {
     private int id;
     private String name;
-    private double price;
+    private double price; 
     private int duration;
     
     private String unit; 

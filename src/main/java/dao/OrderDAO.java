@@ -14,7 +14,7 @@ public class OrderDAO {
 
         try {
             c = KoneksiDB.getConnection();
-            c.setAutoCommit(false);
+            c.setAutoCommit(false); 
 
             String sqlOrder = "INSERT INTO orders (user_id, total_kg, total_amount, status, notes) VALUES (?, ?, ?, ?, ?)";
             psOrder = c.prepareStatement(sqlOrder, Statement.RETURN_GENERATED_KEYS);

@@ -155,7 +155,7 @@
         </div>
     </div>
 
-    <script>
+    <script> 
         function toggleAlamat() {
             const isPickup = document.getElementById('pickup').checked;
             const boxAlamat = document.getElementById('box-alamat');

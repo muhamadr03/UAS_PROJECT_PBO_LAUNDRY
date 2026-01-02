@@ -19,7 +19,7 @@
     <body>
 
         <jsp:include page="includes/navbar.jsp" />
-
+ 
         <header class="hero-header text-center position-relative overflow-hidden">
             <div class="container position-relative z-2">
                 <span class="badge bg-white text-primary px-3 py-2 rounded-pill mb-3 shadow-sm fw-bold">

@@ -29,7 +29,7 @@
                             ServiceDAO dao = new ServiceDAO();
                             
                             List<Service> layanans = dao.getAllServices();
-
+ 
                             for(Service s : layanans) {
                         %>
                         <tr>

@@ -109,7 +109,7 @@ body {
     background: var(--card-3);
 }
 .bg-gradient-2 {
-    background: var(--card-1);
+    background: var(--card-1); 
 }
 .bg-gradient-3 {
     background: var(--card-2);

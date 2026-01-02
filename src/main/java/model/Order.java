@@ -17,7 +17,7 @@ public class Order {
     
     private String deliveryType;
 
-    public Order() {}
+    public Order() {} 
 
     public int getOrderId() { return orderId; }
     public void setOrderId(int orderId) { this.orderId = orderId; }

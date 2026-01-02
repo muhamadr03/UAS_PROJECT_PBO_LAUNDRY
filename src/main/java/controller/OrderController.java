@@ -19,7 +19,7 @@ public class OrderController extends HttpServlet {
             throws ServletException, IOException {
         
         request.setCharacterEncoding("UTF-8");
-        
+         
         HttpSession session = request.getSession();
         User currentUser = (User) session.getAttribute("currentUser");
         

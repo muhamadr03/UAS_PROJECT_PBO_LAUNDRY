@@ -13,7 +13,7 @@ public class KoneksiDB {
             
             String user = "postgres";
             String pass = "123";
-            
+             
             return DriverManager.getConnection(url, user, pass);
             
         } catch (Exception e) {

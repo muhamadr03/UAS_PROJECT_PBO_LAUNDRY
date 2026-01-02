@@ -14,7 +14,7 @@
             
             <a href="${pageContext.request.contextPath}/admin/list-layanan.jsp" class="nav-link text-decoration-none">
                 <i class="fas fa-box-open"></i> Kelola Layanan
-            </a>
+            </a> 
 
             </div>
     </div>

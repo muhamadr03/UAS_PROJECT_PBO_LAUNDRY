@@ -5,7 +5,7 @@ import util.KoneksiDB;
 import model.User;
 
 public class UserDAO {
-    
+     
     public User authenticate(String email, String password) {
         User u = null;
         String sql = "SELECT * FROM users WHERE email = ? AND password_hash = ?";

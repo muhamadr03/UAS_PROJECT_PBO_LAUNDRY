@@ -15,7 +15,7 @@ public class RegisterController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+         
         String nama = request.getParameter("nama");
         String email = request.getParameter("email");
         String pass = request.getParameter("password");
