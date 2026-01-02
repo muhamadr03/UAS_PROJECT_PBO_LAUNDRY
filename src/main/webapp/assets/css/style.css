@@ -1,0 +1,70 @@
+body { 
+    font-family: 'Poppins', sans-serif; 
+    background-color: #f4f7f6; 
+    padding-top: 80px;
+}
+
+.navbar {
+    backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+.navbar-brand { 
+    font-weight: 800; 
+    color: #0d6efd !important; 
+    letter-spacing: -1px; 
+}
+
+.hero-header {
+    background: linear-gradient(135deg, #0d6efd 0%, #00d2ff 100%);
+    color: white;
+    padding: 100px 0 150px; 
+    margin-bottom: -80px; 
+    border-radius: 0 0 50% 50% / 40px; 
+}
+
+.service-card {
+    border: none;
+    border-radius: 20px;
+    background: white;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.service-card:hover {
+    transform: translateY(-15px);
+    box-shadow: 0 20px 40px rgba(13, 110, 253, 0.2);
+}
+
+.icon-circle {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(45deg, #e7f1ff, #ffffff);
+    color: #0d6efd;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.price-text {
+    color: #2c3e50;
+    font-weight: 700;
+    font-size: 1.6rem;
+}
+
+.btn-pesan {
+    background-color: #0d6efd;
+    color: white;
+    border-radius: 50px;
+    padding: 10px 25px;
+    transition: 0.3s;
+}
+
+.btn-pesan:hover {
+    background-color: #0b5ed7;
+    transform: scale(1.05);
+}
