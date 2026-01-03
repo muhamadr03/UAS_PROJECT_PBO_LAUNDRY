@@ -56,4 +56,28 @@ public class UserDAO {
             return false;
         }
     }
+    public java.util.List<model.User> getAllUsers() {
+        java.util.List<model.User> list = new java.util.ArrayList<>();
+        String sql = "SELECT * FROM users ORDER BY user_id DESC";
+        
+        try (java.sql.Connection c = util.KoneksiDB.getConnection();
+             java.sql.Statement s = c.createStatement();
+             java.sql.ResultSet rs = s.executeQuery(sql)) {
+            
+            while (rs.next()) {
+                model.User u = new model.User();
+                u.setId(rs.getInt("user_id"));
+                u.setName(rs.getString("name"));
+                u.setEmail(rs.getString("email"));
+                u.setPhone(rs.getString("phone"));
+                u.setRole(rs.getString("role"));
+                u.setAddress(rs.getString("address"));
+                
+                list.add(u);
+            }
+        } catch (Exception e) {
+            System.out.println("Error getAllUsers: " + e.getMessage());
+        }
+        return list;
+    }
 }

@@ -1,4 +1,45 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="java.util.List"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="java.text.NumberFormat"%>
+<%@page import="java.util.Locale"%>
+<%@page import="dao.OrderDAO"%>
+<%@page import="model.Order"%>
+<%@page import="model.User"%>
+
+<%
+    // --- 1. CEK LOGIN ADMIN ---
+    // Logika ini tetap sama seperti kode Anda
+    User admin = (User) session.getAttribute("currentUser");
+    if(admin == null || (
+       !"admin".equalsIgnoreCase(admin.getRole()) && 
+       !"superadmin".equalsIgnoreCase(admin.getRole())
+       )) {
+        response.sendRedirect("../index.jsp");
+        return;
+    }
+
+    // --- 2. LOGIKA HITUNG STATISTIK ---
+    // Logika perhitungan tetap sama
+    OrderDAO dao = new OrderDAO();
+    List<Order> listOrders = dao.getAllOrders(); 
+
+    int totalPesanan = 0;
+    int pesananSelesai = 0;
+    double totalPendapatan = 0;
+
+    for(Order o : listOrders) {
+        totalPesanan++;
+        if("Completed".equalsIgnoreCase(o.getStatus()) || "Selesai".equalsIgnoreCase(o.getStatus())) {
+            pesananSelesai++;
+        }
+        totalPendapatan += o.getTotalAmount();
+    }
+
+    Locale localeID = new Locale("id", "ID");
+    NumberFormat formatRupiah = NumberFormat.getCurrencyInstance(localeID);
+%>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>  
@@ -10,122 +51,259 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin-style.css">
+    <style>
+        body { font-family: 'Poppins', sans-serif; overflow-x: hidden; background-color: #f0f2f5; }
+        
+        /* --- LAYOUT SIDEBAR --- */
+        #wrapper { display: flex; width: 100%; transition: all 0.3s; }
+        
+        #sidebar-wrapper {
+            min-width: 250px;
+            max-width: 250px;
+            background-color: #212529; /* Warna Dark Sidebar */
+            color: white;
+            min-height: 100vh;
+            transition: margin 0.3s ease-out;
+        }
+        
+        /* Class ini dipakai JS untuk menyembunyikan sidebar */
+        #wrapper.toggled #sidebar-wrapper { margin-left: -250px; }
+        
+        #page-content-wrapper { width: 100%; flex: 1; }
+        
+        .sidebar-heading { padding: 1.5rem 1.25rem; font-size: 1.2rem; font-weight: bold; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .list-group-item { border: none; padding: 15px 25px; background-color: transparent; color: rgba(255,255,255,0.7); }
+        .list-group-item:hover { background-color: rgba(255,255,255,0.1); color: white; }
+        .list-group-item.active { background-color: #0d6efd; color: white; font-weight: bold; }
+        .list-group-item i { width: 25px; }
+
+        /* --- DASHBOARD CARDS & TABLE --- */
+        .stat-card { border-radius: 15px; color: white; transition: transform 0.3s; border:none; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .stat-card:hover { transform: translateY(-5px); }
+        .bg-gradient-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .bg-gradient-2 { background: linear-gradient(135deg, #2af598 0%, #009efd 100%); }
+        .bg-gradient-3 { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%); color: #555; }
+        .bg-gradient-3 .text-white { color: #555 !important; } /* Fix text color for light bg */
+        
+        .table-custom { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
+
+        @media (max-width: 768px) {
+            #sidebar-wrapper { margin-left: -250px; }
+            #wrapper.toggled #sidebar-wrapper { margin-left: 0; }
+        }
+    </style>
 </head>
 <body>
 
-    <jsp:include page="../includes/sidebar.jsp" />
+    <div class="d-flex" id="wrapper">
 
-    <main class="main-content">
-        
-        <div class="d-flex justify-content-between align-items-center mb-5">
-            <div>
-                <h2 class="fw-bold text-dark">Dashboard Overview</h2>
-                <p class="text-muted mb-0">Halo Admin, inilah performa laundry hari ini.</p>
+        <div class="border-end" id="sidebar-wrapper">
+            <div class="sidebar-heading border-bottom bg-dark text-white">
+                <i class="fas fa-soap me-2"></i> Clean Admin
             </div>
-            <div class="d-flex align-items-center bg-white p-2 rounded-pill shadow-sm px-3">
-                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold me-2" 
-                     style="width: 40px; height: 40px; border: 2px solid #e0e0e0;">
-                    SA
-                </div>
-                <div class="me-2 lh-1 text-end d-none d-md-block">
-                    <span class="d-block fw-bold small">Super Admin</span>
-                    <span class="d-block text-muted" style="font-size: 10px;">Online</span>
-                </div>
+            <div class="list-group list-group-flush mt-3">
+                <a href="dashboard.jsp" class="list-group-item list-group-item-action active">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <a href="orders.jsp" class="list-group-item list-group-item-action">
+                    <i class="fas fa-shopping-basket"></i> Kelola Pesanan
+                </a>
+                <a href="users.jsp" class="list-group-item list-group-item-action">
+                    <i class="fas fa-users"></i> Data Pelanggan
+                </a>
+                <a href="../index.jsp" class="list-group-item list-group-item-action mt-5">
+                    <i class="fas fa-home"></i> Ke Website Utama
+                </a>
+                <a href="../LogoutController" class="list-group-item list-group-item-action text-danger">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
             </div>
         </div>
 
-        <div class="row g-4 mb-5">
-            <div class="col-md-4">
-                <div class="stat-card bg-gradient-1 p-4">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div class="fs-1"><i class="fas fa-receipt"></i></div>
-                        <span class="badge bg-white text-primary bg-opacity-75">Hari Ini</span>
-                    </div>
-                    <h5 class="mb-0 opacity-75">Total Pesanan</h5>
-                    <h2 class="fw-bold display-6">12 Order</h2>
-                </div>
-            </div>
-            
-            <div class="col-md-4">
-                <div class="stat-card bg-gradient-2 p-4">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div class="fs-1"><i class="fas fa-check-double"></i></div>
-                        <span class="badge bg-white text-success bg-opacity-75">Completed</span>
-                    </div>
-                    <h5 class="mb-0 opacity-75">Cucian Selesai</h5>
-                    <h2 class="fw-bold display-6">8 Paket</h2>
-                </div>
-            </div>
+        <div id="page-content-wrapper">
 
-            <div class="col-md-4">
-                <div class="stat-card bg-gradient-3 p-4">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div class="fs-1"><i class="fas fa-wallet"></i></div>
-                        <span class="badge bg-white text-danger bg-opacity-75">Profit</span>
-                    </div>
-                    <h5 class="mb-0 opacity-75">Pendapatan</h5>
-                    <h2 class="fw-bold display-6">Rp 450k</h2>
-                </div>
-            </div>
-        </div>
+            <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm px-3 py-3">
+                <div class="container-fluid">
+                    <button class="btn btn-outline-dark" id="menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
 
-        <div class="table-custom">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h5 class="fw-bold mb-0">Pesanan Terbaru Masuk</h5>
-                <button class="btn btn-sm btn-primary rounded-pill px-3">Lihat Semua</button>
-            </div>
-            
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead>
-                        <tr>
-                            <th>ID Order</th>
-                            <th>Pelanggan</th>
-                            <th>Layanan</th>
-                            <th>Status</th>
-                            <th>Total</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><span class="fw-bold text-primary">#ORD-001</span></td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="bg-light rounded-circle p-2 me-2 text-primary fw-bold">BS</div>
-                                    Budi Santoso
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav ms-auto mt-2 mt-lg-0 align-items-center">
+                            <li class="nav-item">
+                                <span class="nav-link fw-bold text-dark">Hi, <%= admin.getName() %></span>
+                            </li>
+                            <li class="nav-item">
+                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold ms-2" style="width: 35px; height: 35px;">
+                                    <%= admin.getName().substring(0,1).toUpperCase() %>
                                 </div>
-                            </td>
-                            <td>Cuci Komplit</td>
-                            <td><span class="badge bg-warning text-dark rounded-pill">Proses</span></td>
-                            <td class="fw-bold">Rp 45.000</td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-primary rounded-circle"><i class="fas fa-eye"></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><span class="fw-bold text-primary">#ORD-002</span></td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="bg-light rounded-circle p-2 me-2 text-primary fw-bold">SA</div>
-                                    Siti Aminah
-                                </div>
-                            </td>
-                            <td>Dry Clean Jas</td>
-                            <td><span class="badge bg-success rounded-pill">Selesai</span></td>
-                            <td class="fw-bold">Rp 60.000</td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-primary rounded-circle"><i class="fas fa-eye"></i></button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
 
-    </main>
+            <div class="container-fluid px-4 py-4" id="main-content">
+                
+                <div class="row g-4 mb-5">
+                    <div class="col-md-4">
+                        <div class="stat-card bg-gradient-1 p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="fs-1"><i class="fas fa-receipt"></i></div>
+                                <span class="badge bg-white text-primary bg-opacity-75">Semua</span>
+                            </div>
+                            <h5 class="mb-0 text-white-50">Total Pesanan</h5>
+                            <h2 class="fw-bold display-6"><%= totalPesanan %> Order</h2>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="stat-card bg-gradient-2 p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="fs-1"><i class="fas fa-check-double"></i></div>
+                                <span class="badge bg-white text-success bg-opacity-75">Selesai</span>
+                            </div>
+                            <h5 class="mb-0 text-white-50">Cucian Selesai</h5>
+                            <h2 class="fw-bold display-6"><%= pesananSelesai %> Paket</h2>
+                        </div>
+                    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+                    <div class="col-md-4">
+                        <div class="stat-card bg-gradient-3 p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3 text-dark">
+                                <div class="fs-1"><i class="fas fa-wallet"></i></div>
+                                <span class="badge bg-white text-danger bg-opacity-75">Revenue</span>
+                            </div>
+                            <h5 class="mb-0 text-muted">Pendapatan</h5>
+                            <h2 class="fw-bold display-6 text-dark"><%= formatRupiah.format(totalPendapatan).replace("Rp", "Rp ") %></h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-custom">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="fw-bold mb-0">Pesanan Masuk Terbaru</h5>
+                        <a href="orders.jsp" class="btn btn-sm btn-primary rounded-pill px-3">Lihat Semua</a>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Pelanggan</th>
+                                    <th>Layanan</th>
+                                    <th>Status</th>
+                                    <th>Total</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% 
+                                    int count = 0;
+                                    for(Order o : listOrders) {
+                                        if(count >= 5) break; 
+                                        count++;
+
+                                        String badgeColor = "bg-secondary";
+                                        if(o.getStatus().equalsIgnoreCase("Pending")) badgeColor = "bg-warning text-dark";
+                                        if(o.getStatus().equalsIgnoreCase("Processing")) badgeColor = "bg-info text-dark";
+                                        if(o.getStatus().equalsIgnoreCase("Completed")) badgeColor = "bg-success";
+                                %>
+                                <tr>
+                                    <td><span class="fw-bold text-primary">#<%= o.getOrderId() %></span></td>
+                                    <td>
+                                        <div class="fw-bold"><%= o.getUserName() %></div>
+                                        <div class="small text-muted"><%= o.getDeliveryType() %></div>
+                                    </td>
+                                    <td><%= o.getServiceName() %></td>
+                                    <td><span class="badge <%= badgeColor %> rounded-pill px-3"><%= o.getStatus() %></span></td>
+                                    <td class="fw-bold"><%= formatRupiah.format(o.getTotalAmount()) %></td>
+                                    <td>
+                                        <a href="orders.jsp" class="btn btn-sm btn-outline-primary rounded-circle"><i class="fas fa-edit"></i></a>
+                                    </td>
+                                </tr>
+                                <% } %>
+                                
+                                <% if(listOrders.isEmpty()) { %>
+                                    <tr><td colspan="6" class="text-center py-4">Data Kosong</td></tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div> </div> </div> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        var el = document.getElementById("wrapper");
+        var toggleButton = document.getElementById("menu-toggle");
+
+        toggleButton.onclick = function () {
+            el.classList.toggle("toggled");
+        };
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // 1. Ambil semua link di sidebar
+            const menuLinks = document.querySelectorAll('#sidebar-wrapper .list-group-item-action');
+            const mainContent = document.getElementById('main-content');
+
+            menuLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    const url = this.href;
+
+                    // Jangan proses jika itu link Logout atau kembali ke Website utama
+                    if (url.includes('LogoutController') || url.includes('index.jsp')) {
+                        return; // Biarkan reload normal
+                    }
+
+                    e.preventDefault(); // Matikan reload bawaan browser
+
+                    // Ubah tampilan link Aktif
+                    menuLinks.forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+
+                    // Tampilkan loading (opsional)
+                    mainContent.style.opacity = '0.5';
+
+                    // 2. Ambil data halaman tujuan
+                    fetch(url)
+                        .then(response => response.text())
+                        .then(html => {
+                            // 3. Ubah text HTML menjadi Dokumen agar bisa diambil sebagian
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(html, 'text/html');
+                            
+                            // Ambil hanya bagian #main-content dari halaman tujuan
+                            const newContent = doc.getElementById('main-content').innerHTML;
+
+                            // 4. Masukkan ke halaman saat ini
+                            mainContent.innerHTML = newContent;
+                            mainContent.style.opacity = '1';
+
+                            // 5. Ubah URL di browser (agar tombol back tetap jalan)
+                            window.history.pushState({path: url}, '', url);
+                            
+                            // Re-init script khusus jika ada (misal tombol di tabel orders)
+                            // Jika ada event listener khusus di dalam konten, harus dipanggil ulang di sini
+                        })
+                        .catch(err => {
+                            console.warn('Gagal memuat halaman.', err);
+                            window.location.href = url; // Fallback: load normal jika error
+                        });
+                });
+            });
+
+            // Handle tombol Back/Forward browser
+            window.onpopstate = function(event) {
+                location.reload(); // Reload saat user tekan back button browser
+            };
+        });
+    </script>
 </body>
 </html>
