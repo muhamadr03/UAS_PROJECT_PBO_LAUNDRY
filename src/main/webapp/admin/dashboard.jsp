@@ -147,7 +147,7 @@
                 </div>
             </nav>
 
-            <div class="container-fluid px-4 py-4" id="main-content">
+            <div class="container-fluid px-4 py-4">
                 
                 <div class="row g-4 mb-5">
                     <div class="col-md-4">
@@ -247,63 +247,6 @@
             el.classList.toggle("toggled");
         };
     </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // 1. Ambil semua link di sidebar
-            const menuLinks = document.querySelectorAll('#sidebar-wrapper .list-group-item-action');
-            const mainContent = document.getElementById('main-content');
-
-            menuLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    const url = this.href;
-
-                    // Jangan proses jika itu link Logout atau kembali ke Website utama
-                    if (url.includes('LogoutController') || url.includes('index.jsp')) {
-                        return; // Biarkan reload normal
-                    }
-
-                    e.preventDefault(); // Matikan reload bawaan browser
-
-                    // Ubah tampilan link Aktif
-                    menuLinks.forEach(l => l.classList.remove('active'));
-                    this.classList.add('active');
-
-                    // Tampilkan loading (opsional)
-                    mainContent.style.opacity = '0.5';
-
-                    // 2. Ambil data halaman tujuan
-                    fetch(url)
-                        .then(response => response.text())
-                        .then(html => {
-                            // 3. Ubah text HTML menjadi Dokumen agar bisa diambil sebagian
-                            const parser = new DOMParser();
-                            const doc = parser.parseFromString(html, 'text/html');
-                            
-                            // Ambil hanya bagian #main-content dari halaman tujuan
-                            const newContent = doc.getElementById('main-content').innerHTML;
-
-                            // 4. Masukkan ke halaman saat ini
-                            mainContent.innerHTML = newContent;
-                            mainContent.style.opacity = '1';
-
-                            // 5. Ubah URL di browser (agar tombol back tetap jalan)
-                            window.history.pushState({path: url}, '', url);
-                            
-                            // Re-init script khusus jika ada (misal tombol di tabel orders)
-                            // Jika ada event listener khusus di dalam konten, harus dipanggil ulang di sini
-                        })
-                        .catch(err => {
-                            console.warn('Gagal memuat halaman.', err);
-                            window.location.href = url; // Fallback: load normal jika error
-                        });
-                });
-            });
-
-            // Handle tombol Back/Forward browser
-            window.onpopstate = function(event) {
-                location.reload(); // Reload saat user tekan back button browser
-            };
-        });
-    </script>
+    
 </body>
 </html>

@@ -122,4 +122,45 @@ public class OrderDAO {
              System.out.println("Error updateStatus: " + e.getMessage());
         }
     }
+    public List<Order> getOrdersByUserId(int userId) {
+        List<Order> list = new ArrayList<>();
+        
+        // 1. Tambahkan 'o.delivery_type' ke dalam SELECT
+        String sql = "SELECT o.order_id, o.order_date, o.total_kg, o.total_amount, o.status, " +
+                     "o.delivery_type, " + // <--- PENTING: Tambahkan ini
+                     "s.name AS service_name " +
+                     "FROM orders o " +
+                     "JOIN order_services os ON o.order_id = os.order_id " +
+                     "JOIN services s ON os.service_id = s.service_id " +
+                     "WHERE o.user_id = ? " +
+                     "ORDER BY o.order_date DESC";
+
+        try (Connection c = KoneksiDB.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            
+            ps.setInt(1, userId);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while(rs.next()) {
+                    Order o = new Order();
+                    o.setOrderId(rs.getInt("order_id"));
+                    o.setOrderDate(rs.getTimestamp("order_date"));
+                    o.setTotalKg(rs.getDouble("total_kg"));
+                    o.setTotalAmount(rs.getDouble("total_amount"));
+                    o.setStatus(rs.getString("status"));
+                    
+                    // 2. Masukkan data ke object Order
+                    o.setDeliveryType(rs.getString("delivery_type")); // <--- PENTING: Tambahkan ini
+                    
+                    // Set nama layanan
+                    o.setServiceName(rs.getString("service_name"));
+                    
+                    list.add(o);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error getOrdersByUserId: " + e.getMessage());
+        }
+        return list;
+    }
 }
