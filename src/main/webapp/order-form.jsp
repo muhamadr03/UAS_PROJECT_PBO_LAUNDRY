@@ -21,7 +21,6 @@
     int id = Integer.parseInt(idStr);
     ServiceDAO dao = new ServiceDAO();
     Service s = dao.getServiceById(id);
-    
     if(s == null) {
         out.println("<h2>Layanan tidak ditemukan!</h2>");
         return;
@@ -59,13 +58,13 @@
                             <label class="form-label fw-bold small text-muted">Opsi Pengiriman</label>
                             <div class="d-flex gap-3">
                                 <div class="form-check card p-3 border shadow-sm w-50" style="cursor: pointer;">
-                                    <input class="form-check-input" type="radio" name="delivery_type" id="pickup" value="pickup" checked onchange="toggleAlamat()">
+                                    <input class="form-check-input" type="radio" name="delivery_type" id="pickup" value="pickup" checked>
                                     <label class="form-check-label fw-bold" for="pickup">
                                         <i class="fas fa-truck text-primary me-2"></i> Antar Jemput
                                     </label>
                                 </div>
                                 <div class="form-check card p-3 border shadow-sm w-50" style="cursor: pointer;">
-                                    <input class="form-check-input" type="radio" name="delivery_type" id="dropoff" value="dropoff" onchange="toggleAlamat()">
+                                    <input class="form-check-input" type="radio" name="delivery_type" id="dropoff" value="dropoff">
                                     <label class="form-check-label fw-bold" for="dropoff">
                                         <i class="fas fa-store text-success me-2"></i> Datang Sendiri
                                     </label>
@@ -93,7 +92,8 @@
                         <div class="col-12 d-none" id="box-toko">
                             <div class="alert alert-success border-0 small">
                                 <i class="fas fa-map-marker-alt me-2"></i> <strong>Alamat Toko Kami:</strong><br>
-                                Jl. Raya Laundry No. 99, Pusat Kota (Depan Indomaret).
+                                Jl. Kebersihan No. 10, Jakarta Selatan<br>
+                                <span class="text-muted" style="font-size: 0.9em;">(Buka setiap hari: 08.00 - 20.00)</span>
                             </div>
                         </div>
 
@@ -105,7 +105,8 @@
                             <input type="number" 
                                    id="input-berat"
                                    step="<%= s.getUnit().equalsIgnoreCase("Kg") ? "0.1" : "1" %>" 
-                                   class="form-control bg-light" name="berat" required placeholder="0">
+                                   min="1"
+                                   class="form-control bg-light" name="berat" required placeholder="Min. 1">
                         </div>
 
                         <div class="col-md-6">
@@ -115,9 +116,17 @@
                                 <option value="Transfer">Transfer Bank</option>
                             </select>
                         </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-bold small text-muted">Catatan Tambahan (Opsional)</label>
+                            <textarea class="form-control bg-light" name="notes" rows="2" 
+                                      placeholder="Contoh: Jangan disetrika, pisahkan warna putih..."></textarea>
+                        </div>
+
                     </div>
 
                     <hr class="my-4 opacity-10">
+                    
                     <button class="btn btn-primary btn-lg w-100 rounded-pill fw-bold py-3 shadow-sm" type="submit">
                         <i class="fas fa-paper-plane me-2"></i> Kirim Pesanan
                     </button>
@@ -140,6 +149,11 @@
                                 </span>
                             </li>
                             
+                            <li class="list-group-item d-flex justify-content-between border-0 px-0">
+                                <span class="text-muted">Biaya Antar Jemput</span>
+                                <span class="fw-bold text-success" id="display-ongkir">Rp 0</span>
+                            </li>
+                            
                             <li class="list-group-item d-flex justify-content-between border-0 px-0 pt-3 border-top">
                                 <span class="fw-bold text-dark">Estimasi Total</span>
                                 <span class="fw-bold text-primary fs-5" id="total-bayar">Rp 0</span>
@@ -147,7 +161,7 @@
                         </ul>
                         
                         <div class="alert alert-light border small text-muted fst-italic">
-                            <i class="fas fa-calculator me-1"></i> Total update otomatis.
+                            <i class="fas fa-calculator me-1"></i> Total biaya sudah termasuk estimasi berat & ongkir (jika ada).
                         </div>
                     </div>
                 </div>
@@ -156,8 +170,51 @@
     </div>
 
     <script> 
-        function toggleAlamat() {
-            const isPickup = document.getElementById('pickup').checked;
+        // 1. KONFIGURASI BIAYA ONGKIR (Misal 10.000)
+        const BIAYA_ONGKIR = 10000;
+
+        // 2. REFERENSI ELEMENT
+        const inputBerat = document.getElementById('input-berat');
+        const displayTotal = document.getElementById('total-bayar');
+        const displayOngkir = document.getElementById('display-ongkir');
+        const elemHarga = document.getElementById('harga-satuan');
+        const radioPickup = document.getElementById('pickup');
+        const radioDropoff = document.getElementById('dropoff');
+        
+        const hargaPerUnit = parseFloat(elemHarga.getAttribute('data-price'));
+
+        // Helper Format Rupiah
+        const formatRupiah = (angka) => {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0
+            }).format(angka);
+        };
+
+        // 3. FUNGSI HITUNG TOTAL
+        function hitungTotal() {
+            // Ambil Berat
+            let jumlah = parseFloat(inputBerat.value);
+            if (isNaN(jumlah) || jumlah < 0) { jumlah = 0; }
+
+            // Cek Ongkir
+            let isPickup = radioPickup.checked;
+            let ongkir = isPickup ? BIAYA_ONGKIR : 0;
+
+            // Hitung
+            let subtotal = jumlah * hargaPerUnit;
+            let totalAkhir = subtotal + ongkir;
+
+            // Update UI
+            displayOngkir.innerText = isPickup ? formatRupiah(ongkir) : "Rp 0";
+            displayTotal.innerText = formatRupiah(totalAkhir);
+
+            // Toggle Tampilan Alamat
+            toggleAlamatUI(isPickup);
+        }
+
+        function toggleAlamatUI(isPickup) {
             const boxAlamat = document.getElementById('box-alamat');
             const boxToko = document.getElementById('box-toko');
             const inputAlamat = document.getElementById('input-alamat');
@@ -173,26 +230,14 @@
             }
         }
 
-        const inputBerat = document.getElementById('input-berat');
-        const displayTotal = document.getElementById('total-bayar');
-        const elemHarga = document.getElementById('harga-satuan');
-        
-        const hargaPerUnit = parseFloat(elemHarga.getAttribute('data-price'));
+        // 4. EVENT LISTENERS
+        inputBerat.addEventListener('input', hitungTotal);
+        radioPickup.addEventListener('change', hitungTotal);
+        radioDropoff.addEventListener('change', hitungTotal);
 
-        const formatRupiah = (angka) => {
-            return new Intl.NumberFormat('id-ID', {
-                style: 'currency',
-                currency: 'IDR',
-                minimumFractionDigits: 0
-            }).format(angka);
-        };
-
-        inputBerat.addEventListener('input', function() {
-            let jumlah = parseFloat(this.value);
-            if (isNaN(jumlah) || jumlah < 0) { jumlah = 0; }
-
-            const total = jumlah * hargaPerUnit;
-            displayTotal.innerText = formatRupiah(total);
+        // Jalankan saat load awal
+        document.addEventListener("DOMContentLoaded", function() {
+            hitungTotal();
         });
     </script>
     
