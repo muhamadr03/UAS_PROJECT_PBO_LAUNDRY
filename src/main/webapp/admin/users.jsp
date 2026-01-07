@@ -23,6 +23,9 @@
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+    
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     
     <style>
@@ -43,12 +46,53 @@
         .list-group-item:hover { background-color: rgba(255,255,255,0.1); color: white; }
         .list-group-item.active { background-color: #0d6efd; color: white; font-weight: bold; }
 
-        /* --- TABLE STYLES --- */
         .card-table { border-radius: 15px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+
+        /* --- CUSTOM DATATABLES STYLE --- */
+        
+        /* 1. Kotak Pencarian (Search) */
+        .dataTables_filter { text-align: right; }
+        .dataTables_filter label { width: 100%; max-width: 300px; position: relative; display: inline-flex; align-items: center; }
+        .dataTables_filter input {
+            width: 100% !important; padding: 10px 20px; padding-left: 40px;
+            border-radius: 50px; border: 1px solid #e0e0e0;
+            background-color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            transition: all 0.3s ease; margin-left: 0 !important; font-size: 0.9rem;
+        }
+        .dataTables_filter input:focus { border-color: #0d6efd; box-shadow: 0 4px 15px rgba(13, 110, 253, 0.15); outline: none; }
+        .dataTables_filter label::before {
+            content: "\f002"; font-family: "Font Awesome 6 Free"; font-weight: 900;
+            position: absolute; left: 15px; color: #aaa; pointer-events: none; font-size: 0.9rem;
+        }
+
+        /* 2. Length Select (Tampilkan X data) - DIPERBAIKI */
+        .dataTables_length { text-align: left; }
+        .dataTables_length label { font-weight: normal; color: #6c757d; font-size: 0.9rem; }
+        .dataTables_length select {
+            border-radius: 50px; 
+            padding: 8px 30px 8px 15px; 
+            border: 1px solid #e0e0e0;
+            background-color: #fff;
+            margin: 0 5px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        .dataTables_length select:focus { border-color: #0d6efd; outline: none; }
+
+        /* 3. Pagination */
+        .dataTables_paginate { margin-top: 20px; display: flex; justify-content: flex-end; gap: 5px; }
+        .page-item .page-link {
+            border: none; border-radius: 50%; width: 35px; height: 35px;
+            display: flex; align-items: center; justify-content: center;
+            color: #555; font-weight: 600; background: transparent; transition: all 0.2s;
+        }
+        .page-item.active .page-link { background-color: #0d6efd; color: white; box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3); }
+        .page-item:hover .page-link:not(.active) { background-color: #f0f2f5; color: #0d6efd; }
 
         @media (max-width: 768px) {
             #sidebar-wrapper { margin-left: -250px; }
             #wrapper.toggled #sidebar-wrapper { margin-left: 0; }
+            .dataTables_filter, .dataTables_length { text-align: center; margin-bottom: 10px; }
         }
     </style>
 </head>
@@ -117,9 +161,10 @@
                 </div>
 
                 <div class="card card-table overflow-hidden">
-                    <div class="card-body p-0">
+                    <div class="card-body p-4">
                         <div class="table-responsive">
-                            <table class="table table-striped table-hover align-middle mb-0">
+                            
+                            <table id="tableUser" class="table table-striped table-hover align-middle mb-0" style="width:100%">
                                 <thead class="bg-primary text-white">
                                     <tr>
                                         <th class="ps-4 py-3">ID</th>
@@ -133,14 +178,7 @@
                                     <%
                                         UserDAO dao = new UserDAO();
                                         List<User> users = dao.getAllUsers();
-                                        
-                                        if (users.isEmpty()) {
-                                    %>
-                                        <tr>
-                                            <td colspan="5" class="text-center py-5 text-muted">Belum ada user terdaftar.</td>
-                                        </tr>
-                                    <%  } else {
-                                            for(User u : users) {
+                                        for(User u : users) {
                                     %>
                                     <tr>
                                         <td class="ps-4 fw-bold">#<%= u.getId() %></td>
@@ -170,80 +208,55 @@
                                             <%= u.getAddress() != null && !u.getAddress().isEmpty() ? u.getAddress() : "<span class='fst-italic'>Belum diisi</span>" %>
                                         </td>
                                     </tr>
-                                    <% } } %>
+                                    <% } %>
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                    <div class="card-footer bg-white py-3">
-                        <small class="text-muted">Total Pengguna Terdaftar: <strong><%= users.size() %></strong></small>
-                    </div>
                 </div>
 
-            </div> </div> </div> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            </div> 
+        </div> 
+    </div> 
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+    
     <script>
         var el = document.getElementById("wrapper");
         var toggleButton = document.getElementById("menu-toggle");
         toggleButton.onclick = function () {
             el.classList.toggle("toggled");
         };
-    </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // 1. Ambil semua link di sidebar
-            const menuLinks = document.querySelectorAll('#sidebar-wrapper .list-group-item-action');
-            const mainContent = document.getElementById('main-content');
 
-            menuLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    const url = this.href;
-
-                    // Jangan proses jika itu link Logout atau kembali ke Website utama
-                    if (url.includes('LogoutController') || url.includes('index.jsp')) {
-                        return; // Biarkan reload normal
+        $(document).ready(function () {
+            $('#tableUser').DataTable({
+                // Konfigurasi DOM untuk Tata Letak:
+                // l = length (kiri), f = filtering (kanan) dalam satu baris flex
+                // t = table
+                // i = info (kiri), p = pagination (kanan) dalam satu baris flex
+                "dom": '<"d-flex justify-content-between align-items-center mb-3"lf>t<"d-flex justify-content-between align-items-center mt-3"ip>',
+                
+                "language": {
+                    "search": "", // Hapus label "Search:"
+                    "searchPlaceholder": "Cari user...", 
+                    "lengthMenu": "Tampilkan _MENU_ data", // Label untuk Length Select
+                    "zeroRecords": "<div class='text-center py-4'><i class='fas fa-user-slash fa-3x text-muted mb-3'></i><p class='text-muted'>User tidak ditemukan.</p></div>",
+                    "info": "Menampilkan _START_ - _END_ dari _TOTAL_ user",
+                    "infoEmpty": "Belum ada data",
+                    "infoFiltered": "(dari _MAX_ total user)",
+                    "paginate": {
+                        "first": "<<",
+                        "last": ">>",
+                        "next": "<i class='fas fa-chevron-right'></i>",
+                        "previous": "<i class='fas fa-chevron-left'></i>"
                     }
-
-                    e.preventDefault(); // Matikan reload bawaan browser
-
-                    // Ubah tampilan link Aktif
-                    menuLinks.forEach(l => l.classList.remove('active'));
-                    this.classList.add('active');
-
-                    // Tampilkan loading (opsional)
-                    mainContent.style.opacity = '0.5';
-
-                    // 2. Ambil data halaman tujuan
-                    fetch(url)
-                        .then(response => response.text())
-                        .then(html => {
-                            // 3. Ubah text HTML menjadi Dokumen agar bisa diambil sebagian
-                            const parser = new DOMParser();
-                            const doc = parser.parseFromString(html, 'text/html');
-                            
-                            // Ambil hanya bagian #main-content dari halaman tujuan
-                            const newContent = doc.getElementById('main-content').innerHTML;
-
-                            // 4. Masukkan ke halaman saat ini
-                            mainContent.innerHTML = newContent;
-                            mainContent.style.opacity = '1';
-
-                            // 5. Ubah URL di browser (agar tombol back tetap jalan)
-                            window.history.pushState({path: url}, '', url);
-                            
-                            // Re-init script khusus jika ada (misal tombol di tabel orders)
-                            // Jika ada event listener khusus di dalam konten, harus dipanggil ulang di sini
-                        })
-                        .catch(err => {
-                            console.warn('Gagal memuat halaman.', err);
-                            window.location.href = url; // Fallback: load normal jika error
-                        });
-                });
+                },
+                "pageLength": 10 // Default tampil 10 data
             });
-
-            // Handle tombol Back/Forward browser
-            window.onpopstate = function(event) {
-                location.reload(); // Reload saat user tekan back button browser
-            };
         });
     </script>
 </body>
