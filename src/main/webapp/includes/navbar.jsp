@@ -18,7 +18,7 @@
                     <a class="nav-link" href="${pageContext.request.contextPath}/index.jsp">Beranda</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="${pageContext.request.contextPath}/index.jsp#services">Layanan</a>
+                    <a class="nav-link" href="${pageContext.request.contextPath}/services.jsp">Layanan</a>
                 </li>
 
                 <%-- 2. MENU KHUSUS LOGIN --%>
