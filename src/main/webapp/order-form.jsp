@@ -50,7 +50,8 @@
                 <h4 class="mb-3 fw-bold text-primary"><i class="fas fa-clipboard-list me-2"></i>Detail Pesanan</h4>
                 
                 <form action="${pageContext.request.contextPath}/OrderController" method="POST" class="card shadow-sm border-0 rounded-4 p-4">
-                    <input type="hidden" name="service_id" value="<%= s.getId() %>">
+                    <input type="hidden" name="action" value="create_order_customer">
+                    <input type="hidden" name="service_id" value="<%= s.getId() %>"><input type="hidden" name="service_id" value="<%= s.getId() %>">
                     
                     <div class="row g-3">
                         

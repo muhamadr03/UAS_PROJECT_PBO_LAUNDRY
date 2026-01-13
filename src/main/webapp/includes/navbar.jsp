@@ -18,18 +18,20 @@
                     <a class="nav-link" href="${pageContext.request.contextPath}/index.jsp">Beranda</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="${pageContext.request.contextPath}/index.jsp#services">Layanan</a>
+                    <a class="nav-link" href="${pageContext.request.contextPath}/services.jsp">Layanan</a>
                 </li>
-
+                <li class="nav-item">
+                    <a class="nav-link" href="${pageContext.request.contextPath}/index.jsp#about">Tentang Kami</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="${pageContext.request.contextPath}/gallery.jsp">Galeri</a>
+                </li>
+                
                 <%-- 2. MENU KHUSUS LOGIN --%>
                 <%
                     User navUser = (User) session.getAttribute("currentUser");
                     if (navUser != null) {
                 %>
-                    <li class="nav-item">
-                        <a class="nav-link" href="${pageContext.request.contextPath}/my-orders.jsp">Riwayat Pesanan</a>
-                    </li>
-
                     <li class="nav-item d-none d-lg-block mx-2 text-muted">|</li>
 
                     <li class="nav-item dropdown">

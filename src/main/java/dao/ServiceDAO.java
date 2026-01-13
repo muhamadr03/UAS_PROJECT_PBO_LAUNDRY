@@ -6,68 +6,84 @@ import util.KoneksiDB;
 import model.Service;
 
 public class ServiceDAO {
-     
+
+    // 1. AMBIL SEMUA (READ)
     public List<Service> getAllServices() {
         List<Service> list = new ArrayList<>();
-        
         String sql = "SELECT * FROM services ORDER BY service_id ASC";
-        
         try (Connection c = KoneksiDB.getConnection();
-             Statement s = c.createStatement();
-             ResultSet r = s.executeQuery(sql)) {
-            
-            while (r.next()) {
-                Service svc = new Service();
-                
-                svc.setId(r.getInt("service_id"));
-                svc.setName(r.getString("name"));
-                
-                svc.setPrice(r.getDouble("price")); 
-                
-                svc.setDuration(r.getInt("estimated_days"));
-                
-                svc.setUnit(r.getString("unit")); 
-                
-                list.add(svc);
+             PreparedStatement ps = c.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while(rs.next()) {
+                Service s = new Service();
+                s.setId(rs.getInt("service_id"));
+                s.setName(rs.getString("name"));
+                s.setPrice(rs.getDouble("price"));
+                s.setEstimatedDays(rs.getInt("estimated_days")); 
+                s.setUnit(rs.getString("unit"));
+                list.add(s);
             }
-        } catch (Exception e) {
-            System.out.println("Error ambil data: " + e.getMessage());
-        }
+        } catch (Exception e) { e.printStackTrace(); }
         return list;
     }
-    
-    public Service getServiceById(int id) {
-        Service svc = null;
-        String sql = "SELECT * FROM services WHERE service_id = ?";
-        
+
+    // 2. TAMBAH (CREATE)
+    public boolean insertService(Service s) {
+        String sql = "INSERT INTO services (name, price, estimated_days, unit) VALUES (?, ?, ?, ?)";
         try (Connection c = KoneksiDB.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
-            
-            ps.setInt(1, id);
-            ResultSet r = ps.executeQuery();
-            
-            if (r.next()) {
-                svc = new Service();
-                svc.setId(r.getInt("service_id"));
-                svc.setName(r.getString("name"));
-                
-                svc.setPrice(r.getDouble("price")); 
-                svc.setDuration(r.getInt("estimated_days"));
-                svc.setUnit(r.getString("unit"));
-            }
-        } catch (Exception e) {
-            System.out.println("Error ambil detail service: " + e.getMessage());
-        }
-        return svc;
+            ps.setString(1, s.getName());
+            ps.setDouble(2, s.getPrice());
+            ps.setInt(3, s.getEstimatedDays());
+            ps.setString(4, s.getUnit());
+            ps.executeUpdate();
+            return true;
+        } catch (Exception e) { e.printStackTrace(); return false; }
     }
 
-    public static void main(String[] args) {
-        ServiceDAO dao = new ServiceDAO();
-        List<Service> data = dao.getAllServices();
-        
-        System.out.println("=== TES DATABASE SERVICES ===");
-        for(Service s : data) {
-            System.out.println(s.getName() + " | Rp " + (int)s.getPrice() + " / " + s.getUnit());
-        }
+    // 3. EDIT (UPDATE)
+    public boolean updateService(Service s) {
+        String sql = "UPDATE services SET name=?, price=?, estimated_days=?, unit=? WHERE service_id=?";
+        try (Connection c = KoneksiDB.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, s.getName());
+            ps.setDouble(2, s.getPrice());
+            ps.setInt(3, s.getEstimatedDays());
+            ps.setString(4, s.getUnit());
+            ps.setInt(5, s.getId());
+            ps.executeUpdate();
+            return true;
+        } catch (Exception e) { e.printStackTrace(); return false; }
+    }
+
+    // 4. HAPUS (DELETE)
+    public boolean deleteService(int id) {
+        String sql = "DELETE FROM services WHERE service_id=?";
+        try (Connection c = KoneksiDB.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ps.executeUpdate();
+            return true;
+        } catch (Exception e) { e.printStackTrace(); return false; }
+    }
+    
+    // 5. GET BY ID (PENTING UNTUK ORDER)
+    public Service getServiceById(int id) {
+        Service s = null;
+        String sql = "SELECT * FROM services WHERE service_id=?";
+        try (Connection c = KoneksiDB.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if(rs.next()) {
+                    s = new Service();
+                    s.setId(rs.getInt("service_id"));
+                    s.setName(rs.getString("name"));
+                    s.setPrice(rs.getDouble("price"));
+                    s.setEstimatedDays(rs.getInt("estimated_days"));
+                    s.setUnit(rs.getString("unit"));
+                }
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return s;
     }
 }

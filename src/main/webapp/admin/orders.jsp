@@ -176,28 +176,7 @@
 
     <div class="d-flex" id="wrapper">
 
-        <div class="border-end" id="sidebar-wrapper">
-            <div class="sidebar-heading border-bottom bg-dark text-white">
-                <i class="fas fa-soap me-2"></i> Clean Admin
-            </div>
-            <div class="list-group list-group-flush mt-3">
-                <a href="dashboard.jsp" class="list-group-item list-group-item-action">
-                    <i class="fas fa-tachometer-alt me-2"></i> Dashboard
-                </a>
-                <a href="orders.jsp" class="list-group-item list-group-item-action active">
-                    <i class="fas fa-shopping-basket me-2"></i> Kelola Pesanan
-                </a>
-                <a href="users.jsp" class="list-group-item list-group-item-action">
-                    <i class="fas fa-users me-2"></i> Data Pelanggan
-                </a>
-                <a href="../index.jsp" class="list-group-item list-group-item-action mt-5">
-                    <i class="fas fa-home me-2"></i> Ke Website Utama
-                </a>
-                <a href="../LogoutController" class="list-group-item list-group-item-action text-danger">
-                    <i class="fas fa-sign-out-alt me-2"></i> Logout
-                </a>
-            </div>
-        </div>
+        <jsp:include page="../includes/sidebar.jsp" />
 
         <div id="page-content-wrapper">
             

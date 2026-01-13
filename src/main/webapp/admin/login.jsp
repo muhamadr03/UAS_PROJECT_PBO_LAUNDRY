@@ -14,7 +14,7 @@
             body {
                 font-family: 'Poppins', sans-serif;
                 background-color: #f0f2f5;
-                height: 100vh;
+                min-height: 100vh;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -58,11 +58,25 @@
                 transform: translateY(-2px);
                 box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
             }
+            /* Style khusus untuk Info Akun Demo */
+            .demo-account-box {
+                background-color: #e7f1ff;
+                border: 1px dashed #0d6efd;
+                border-radius: 10px;
+                font-size: 0.85rem;
+            }
+            .copy-badge {
+                cursor: pointer;
+                transition: 0.2s;
+            }
+            .copy-badge:hover {
+                background-color: #0a58ca !important;
+            }
         </style>
     </head>
     <body>
 
-        <div class="container">
+        <div class="container py-5">
             <div class="row justify-content-center">
                 <div class="col-md-5 col-lg-4">
 
@@ -75,7 +89,32 @@
                         </div>
 
                         <div class="card-body p-4 p-md-5">
+                            
+                            <div class="demo-account-box p-3 mb-4">
+                                <div class="d-flex align-items-center mb-2 text-primary fw-bold">
+                                    <i class="fas fa-info-circle me-2"></i> Akun Demo (Untuk Testing)
+                                </div>
+                                
+                                <div class="d-flex justify-content-between align-items-center mb-2 border-bottom border-primary border-opacity-25 pb-2">
+                                    <div>
+                                        <span class="badge bg-danger mb-1">ADMIN</span><br>
+                                        <span class="text-dark fw-bold">admin@laundry.com</span>
+                                    </div>
+                                    <span class="badge bg-primary copy-badge" onclick="fillLogin('admin@laundry.com', 'super123')" title="Klik untuk pakai">
+                                        Pass: super123
+                                    </span>
+                                </div>
 
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="badge bg-success mb-1">USER</span><br>
+                                        <span class="text-dark fw-bold">tester@gmail.com</span>
+                                    </div>
+                                    <span class="badge bg-primary copy-badge" onclick="fillLogin('tester@gmail.com', '123')" title="Klik untuk pakai">
+                                        Pass: 123
+                                    </span>
+                                </div>
+                            </div>
                             <%
                                 String errorCode = request.getParameter("error");
                                 if (errorCode != null) {
@@ -106,7 +145,7 @@
                                     <label class="form-label small fw-bold text-muted">EMAIL</label>
                                     <div class="input-group">
                                         <span class="input-group-text text-muted"><i class="fas fa-envelope"></i></span>
-                                        <input type="email" name="email" class="form-control" placeholder="admin@laundry.com" required>
+                                        <input type="email" name="email" id="emailInput" class="form-control" placeholder="Contoh: admin@laundry.com" required>
                                     </div>
                                 </div>
 
@@ -114,7 +153,7 @@
                                     <label class="form-label small fw-bold text-muted">PASSWORD</label>
                                     <div class="input-group">
                                         <span class="input-group-text text-muted"><i class="fas fa-lock"></i></span>
-                                        <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                                        <input type="password" name="password" id="passInput" class="form-control" placeholder="••••••••" required>
                                     </div>
                                 </div>
 
@@ -146,6 +185,13 @@
                 </div>
             </div>
         </div>
+        
+        <script>
+            function fillLogin(email, pass) {
+                document.getElementById('emailInput').value = email;
+                document.getElementById('passInput').value = pass;
+            }
+        </script>
 
     </body>
 </html>
