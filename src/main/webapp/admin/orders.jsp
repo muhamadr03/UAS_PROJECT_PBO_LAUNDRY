@@ -267,28 +267,58 @@
                                         <td class="text-center">
                                             <span class="badge <%= badgeClass %> rounded-pill px-3"><%= o.getStatus() %></span>
                                         </td>
-                                        <td>
-    <div class="d-flex gap-2"> <a href="invoice.jsp?id=<%= o.getOrderId() %>" target="_blank" class="btn btn-outline-dark btn-sm rounded-circle" title="Cetak Nota">
-            <i class="fas fa-print"></i>
-        </a>
+                                       <td>
+                                        <div class="d-flex gap-2">
 
-        <form action="orders.jsp" method="POST" class="d-flex align-items-center gap-2">
-            <input type="hidden" name="action" value="update_status">
-            <input type="hidden" name="order_id" value="<%= o.getOrderId() %>">
-            
-            <select name="status" class="form-select form-select-sm status-select" style="width: 110px;">
-                <option value="Pending" <%= o.getStatus().equalsIgnoreCase("Pending") ? "selected" : "" %>>Pending</option>
-                <option value="Processing" <%= o.getStatus().equalsIgnoreCase("Processing") ? "selected" : "" %>>Proses</option>
-                <option value="Completed" <%= o.getStatus().equalsIgnoreCase("Completed") ? "selected" : "" %>>Selesai</option>
-                <option value="Cancelled" <%= o.getStatus().equalsIgnoreCase("Cancelled") ? "selected" : "" %>>Batal</option>
-            </select>
-            
-            <button type="submit" class="btn btn-primary btn-sm btn-update" title="Simpan">
-                <i class="fas fa-save"></i>
-            </button>
-        </form>
-    </div>
-</td>
+                                            <a href="invoice.jsp?id=<%= o.getOrderId() %>" target="_blank" class="btn btn-outline-dark btn-sm rounded-circle" title="Cetak Nota">
+                                                <i class="fas fa-print"></i>
+                                            </a>
+
+                                            <%
+                                                // Ambil No HP (Pastikan di OrderDAO query-nya sudah SELECT pickup_phone atau join ke user phone)
+                                                String noHp = o.getPickupPhone(); 
+                                                if(noHp == null || noHp.isEmpty()) noHp = "-";
+
+                                                // Format No HP: Ubah 08... menjadi 628... agar link WA jalan
+                                                if(noHp.startsWith("0")) {
+                                                    noHp = "62" + noHp.substring(1);
+                                                }
+
+                                                // Pesan Otomatis
+                                                String pesanWA = "Halo Kak " + o.getUserName() + 
+                                                                 ", pesanan Laundry #" + o.getOrderId() + 
+                                                                 " statusnya: *" + o.getStatus() + "*. " +
+                                                                 "Total: " + formatRupiah.format(o.getTotalAmount());
+                                            %>
+
+                                            <% if(!noHp.equals("-")) { %>
+                                                <a href="https://wa.me/<%= noHp %>?text=<%= java.net.URLEncoder.encode(pesanWA, "UTF-8") %>" 
+                                                   target="_blank" class="btn btn-success btn-sm rounded-circle" title="Chat WA">
+                                                    <i class="fab fa-whatsapp"></i>
+                                                </a>
+                                            <% } else { %>
+                                                <button class="btn btn-secondary btn-sm rounded-circle" disabled title="No HP Tidak Tersedia">
+                                                    <i class="fab fa-whatsapp"></i>
+                                                </button>
+                                            <% } %>
+
+                                            <form action="orders.jsp" method="POST" class="d-flex align-items-center gap-2">
+                                                <input type="hidden" name="action" value="update_status">
+                                                <input type="hidden" name="order_id" value="<%= o.getOrderId() %>">
+
+                                                <select name="status" class="form-select form-select-sm status-select" style="width: 110px;">
+                                                    <option value="Pending" <%= o.getStatus().equalsIgnoreCase("Pending") ? "selected" : "" %>>Pending</option>
+                                                    <option value="Processing" <%= o.getStatus().equalsIgnoreCase("Processing") ? "selected" : "" %>>Proses</option>
+                                                    <option value="Completed" <%= o.getStatus().equalsIgnoreCase("Completed") ? "selected" : "" %>>Selesai</option>
+                                                    <option value="Cancelled" <%= o.getStatus().equalsIgnoreCase("Cancelled") ? "selected" : "" %>>Batal</option>
+                                                </select>
+
+                                                <button type="submit" class="btn btn-primary btn-sm btn-update" title="Simpan Status">
+                                                    <i class="fas fa-save"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
                                     </tr>
                                     <% } %>
                                 </tbody>

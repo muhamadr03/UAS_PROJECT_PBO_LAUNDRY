@@ -7,7 +7,7 @@ import model.Order;
 
 public class OrderDAO {
 
-    // 1. INPUT PESANAN BARU
+    // INPUT PESANAN BARU
     public boolean insertOrder(Order o) {
         Connection c = null;
         PreparedStatement psOrder = null;
@@ -16,7 +16,7 @@ public class OrderDAO {
 
         try {
             c = KoneksiDB.getConnection();
-            c.setAutoCommit(false); // Transaction Start
+            c.setAutoCommit(false);
 
             // Query Insert Lengkap
             String sqlOrder = "INSERT INTO orders (user_id, total_kg, total_amount, status, notes, delivery_type, pickup_address, pickup_phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
@@ -67,12 +67,16 @@ public class OrderDAO {
         }
     }
 
-    // 2. AMBIL SEMUA PESANAN (UNTUK ADMIN DASHBOARD)
+    // =========================================================================
+    // PERBAIKAN UTAMA ADA DI SINI (GET ALL ORDERS)
+    // =========================================================================
     public List<Order> getAllOrders() {
         List<Order> list = new ArrayList<>();
+        
+        // KITA TAMBAHKAN: o.pickup_phone DAN u.phone AS user_phone
         String sql = "SELECT o.order_id, o.order_date, o.total_kg, o.total_amount, o.status, " +
-                     "o.delivery_type, o.pickup_address, " +
-                     "u.name AS user_name, " +
+                     "o.delivery_type, o.pickup_address, o.pickup_phone, " + // <--- Ambil Phone Order
+                     "u.name AS user_name, u.phone AS user_phone, " +        // <--- Ambil Phone User
                      "s.name AS service_name " +
                      "FROM orders o " +
                      "JOIN users u ON o.user_id = u.user_id " +
@@ -95,6 +99,21 @@ public class OrderDAO {
                 o.setPickupAddress(rs.getString("pickup_address"));
                 o.setUserName(rs.getString("user_name"));
                 o.setServiceName(rs.getString("service_name"));
+                
+                // --- LOGIKA CERDAS PENGAMBILAN NOMOR HP ---
+                // 1. Ambil nomor dari inputan order
+                String hpPesanan = rs.getString("pickup_phone");
+                // 2. Ambil nomor dari profil user
+                String hpUser = rs.getString("user_phone");
+                
+                // 3. Prioritas: Pakai nomor order, kalau kosong pakai nomor user
+                if(hpPesanan != null && !hpPesanan.isEmpty()) {
+                    o.setPickupPhone(hpPesanan);
+                } else {
+                    o.setPickupPhone(hpUser);
+                }
+                // ------------------------------------------
+
                 list.add(o);
             }
         } catch (Exception e) {
@@ -103,7 +122,7 @@ public class OrderDAO {
         return list;
     }
 
-    // 3. UPDATE STATUS
+    // UPDATE STATUS
     public void updateStatus(int orderId, String newStatus) {
         String sql = "UPDATE orders SET status = ? WHERE order_id = ?";
         try (Connection c = KoneksiDB.getConnection();
@@ -116,7 +135,7 @@ public class OrderDAO {
         }
     }
 
-    // 4. RIWAYAT PESANAN USER
+    // RIWAYAT PESANAN USER
     public List<Order> getOrdersByUserId(int userId) {
         List<Order> list = new ArrayList<>();
         String sql = "SELECT o.order_id, o.order_date, o.total_kg, o.total_amount, o.status, " +
@@ -150,12 +169,11 @@ public class OrderDAO {
         return list;
     }
 
-    // 5. DETAIL PESANAN (UNTUK INVOICE)
-    // *** BAGIAN INI SUDAH DIPERBAIKI UNTUK MENGAMBIL NO HP DARI ORDERS ***
+    // DETAIL PESANAN (UNTUK INVOICE)
     public Order getOrderById(int orderId) {
         Order o = null;
         String sql = "SELECT o.order_id, o.order_date, o.total_kg, o.total_amount, o.status, " +
-                     "o.delivery_type, o.pickup_address, o.pickup_phone, " + // Ambil pickup_phone dari tabel orders
+                     "o.delivery_type, o.pickup_address, o.pickup_phone, " + 
                      "u.name AS user_name, " + 
                      "s.name AS service_name, s.price AS service_price " +
                      "FROM orders o " +
@@ -164,12 +182,12 @@ public class OrderDAO {
                      "JOIN services s ON os.service_id = s.service_id " +
                      "WHERE o.order_id = ?";
 
-        try (java.sql.Connection c = util.KoneksiDB.getConnection();
-             java.sql.PreparedStatement ps = c.prepareStatement(sql)) {
+        try (Connection c = KoneksiDB.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
             
             ps.setInt(1, orderId);
             
-            try (java.sql.ResultSet rs = ps.executeQuery()) {
+            try (ResultSet rs = ps.executeQuery()) {
                 if(rs.next()) {
                     o = new Order();
                     o.setOrderId(rs.getInt("order_id"));
@@ -180,7 +198,6 @@ public class OrderDAO {
                     o.setDeliveryType(rs.getString("delivery_type"));
                     o.setPickupAddress(rs.getString("pickup_address"));
                     
-                    // --- PERBAIKAN: Ambil phone dari Order, bukan User ---
                     o.setPickupPhone(rs.getString("pickup_phone")); 
                     
                     o.setUserName(rs.getString("user_name"));
@@ -191,5 +208,51 @@ public class OrderDAO {
             System.out.println("Error getOrderById: " + e.getMessage());
         }
         return o;
+    }
+    
+    // LAPORAN PENDAPATAN
+    public List<Order> getReportByDate(String startDate, String endDate) {
+        List<Order> list = new ArrayList<>();
+        
+        String sql = "SELECT o.order_id, o.order_date, o.status, o.total_amount, o.total_kg, "
+                   + "u.name as user_name, "      
+                   + "s.name as service_name "    
+                   + "FROM orders o "
+                   + "JOIN users u ON o.user_id = u.user_id "               
+                   + "JOIN order_services os ON o.order_id = os.order_id "  
+                   + "JOIN services s ON os.service_id = s.service_id "     
+                   + "WHERE o.order_date BETWEEN ? AND ? "
+                   + "ORDER BY o.order_date DESC";
+        
+        try (Connection c = KoneksiDB.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            
+            String startFull = startDate + " 00:00:00";
+            String endFull = endDate + " 23:59:59";
+            
+            ps.setTimestamp(1, java.sql.Timestamp.valueOf(startFull)); 
+            ps.setTimestamp(2, java.sql.Timestamp.valueOf(endFull));
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while(rs.next()) {
+                    Order o = new Order();
+                    
+                    o.setOrderId(rs.getInt("order_id"));          
+                    o.setOrderDate(rs.getTimestamp("order_date"));
+                    o.setStatus(rs.getString("status"));
+                    o.setTotalAmount(rs.getDouble("total_amount"));
+                    o.setTotalKg(rs.getDouble("total_kg"));
+                    
+                    o.setUserName(rs.getString("user_name"));
+                    o.setServiceName(rs.getString("service_name"));
+                    
+                    list.add(o);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("ERROR SQL LAPORAN: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return list;
     }
 }

@@ -77,10 +77,17 @@
             </a>
             
             <a href="<%= contextPath %>/admin/users.jsp" class="nav-link text-decoration-none <%= pUsers %>">
-                <i class="fas fa-users"></i> Data Pelanggan
+                <i class="fas fa-users"></i> Kelola User
             </a>
             <a href="<%= contextPath %>/admin/gallery.jsp" class="nav-link text-decoration-none <%= uri.contains("gallery.jsp") ? "active" : "" %>">
                 <i class="fas fa-images"></i> Kelola Galeri
+            </a>
+            <%
+                String pReport = uri.contains("reports.jsp") ? "active" : "";
+            %>
+
+            <a href="<%= contextPath %>/admin/reports.jsp" class="nav-link text-decoration-none <%= pReport %>">
+                <i class="fas fa-chart-line"></i> Laporan
             </a>
         </div>
     </div>
@@ -91,5 +98,7 @@
             <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
         </a>
     </div>
+            
+    
 
 </nav>

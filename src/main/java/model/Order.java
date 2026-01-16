@@ -1,24 +1,26 @@
 package model;
+
 import java.sql.Timestamp;
 
 public class Order {
     private int orderId;
     private int userId;
     private Timestamp orderDate;
-    private double totalKg;
+    private double weight;      // SEBELUMNYA 'totalKg', KITA UBAH JADI 'weight'
     private double totalAmount;
     private String status;
     private String notes;
     private String deliveryType;
     private String pickupAddress;
-    private String pickupPhone; // Field Baru
+    private String pickupPhone; 
     
-    // Join Fields
+    // Join Fields (Variabel Bantuan untuk menampilkan Nama, bukan ID)
     private String userName;
     private int serviceId;
     private String serviceName;
 
-    // Getters Setters
+    // ================= GETTERS & SETTERS =================
+
     public int getOrderId() { return orderId; }
     public void setOrderId(int orderId) { this.orderId = orderId; }
 
@@ -28,8 +30,14 @@ public class Order {
     public Timestamp getOrderDate() { return orderDate; }
     public void setOrderDate(Timestamp orderDate) { this.orderDate = orderDate; }
 
-    public double getTotalKg() { return totalKg; }
-    public void setTotalKg(double totalKg) { this.totalKg = totalKg; }
+    // --- BAGIAN INI YANG DIPERBAIKI (Weight) ---
+    public double getWeight() { return weight; }
+    public void setWeight(double weight) { this.weight = weight; }
+    
+    // (Opsional) Alias untuk jaga-jaga jika ada JSP lama yang panggil totalKg
+    public double getTotalKg() { return weight; }
+    public void setTotalKg(double weight) { this.weight = weight; }
+    // -------------------------------------------
 
     public double getTotalAmount() { return totalAmount; }
     public void setTotalAmount(double totalAmount) { this.totalAmount = totalAmount; }
@@ -48,6 +56,8 @@ public class Order {
     
     public String getPickupPhone() { return pickupPhone; }
     public void setPickupPhone(String pickupPhone) { this.pickupPhone = pickupPhone; }
+
+    // --- Join Fields Getters Setters ---
 
     public String getUserName() { return userName; }
     public void setUserName(String userName) { this.userName = userName; }

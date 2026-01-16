@@ -58,19 +58,53 @@
         .about-img { border-radius: 30px; box-shadow: 20px 20px 0px var(--accent-color); }
 
         /* TEAM SECTION */
-        .team-card { border: none; background: transparent; }
-        .team-img { 
-            width: 140px; height: 140px; object-fit: cover; border-radius: 50%; 
-            border: 5px solid white; box-shadow: 0 10px 20px rgba(0,0,0,0.1); 
-            transition: 0.3s;
+        .team-card-modern {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.05);
         }
-        .team-card:hover .team-img { transform: scale(1.1); border-color: var(--accent-color); }
+        .team-card-modern:hover {
+            transform: translateY(-10px); /* Kartu naik sedikit */
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
+        }
 
-        /* TESTIMONIAL */
-        .testimonial-section { background-color: #1e1e2e; color: white; border-top-left-radius: 80px; }
-        .testimonial-card {
-            background: rgba(255,255,255,0.05); backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 30px;
+        /* Gambar Anggota */
+        .team-img-wrapper {
+            overflow: hidden;
+            position: relative;
+        }
+        .team-img {
+            transition: transform 0.5s ease;
+        }
+        .team-card-modern:hover .team-img {
+            transform: scale(1.1); /* Zoom in gambar saat hover */
+        }
+
+        /* Overlay Sosmed (Latar belakang gelap saat hover) */
+        .team-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(67, 97, 238, 0.85); /* Warna biru transparan */
+            opacity: 0;
+            transition: all 0.3s ease;
+            transform: translateY(20px); /* Awalnya sedikit di bawah */
+        }
+        .team-card-modern:hover .team-overlay {
+            opacity: 1; /* Muncul */
+            transform: translateY(0); /* Geser ke posisi normal */
+        }
+
+        /* Tombol Sosmed */
+        .social-btn {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem;
+            transition: 0.2s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .social-btn:hover {
+            background-color: white;
+            transform: scale(1.2); /* Membesar saat di-klik */
         }
         
         /* TEXT HIGHLIGHT */
@@ -227,40 +261,95 @@
         </div>
     </section>
 
-    <section class="container py-5">
-        <div class="text-center mb-5">
-            <h6 class="text-primary fw-bold text-uppercase">Tim Kami</h6>
-            <h2 class="fw-bold">Wajah Di Balik Layar</h2>
-        </div>
+    <section class="py-5 bg-white">
+        <div class="container py-4">
+            <div class="text-center mb-5">
+                <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill mb-3 fw-bold ls-1">
+                    TIM KAMI
+                </span>
+                <h2 class="fw-bold display-6">Wajah Di Balik Layar</h2>
+                <p class="text-muted">Orang-orang hebat yang membangun sistem ini.</p>
+            </div>
 
-        <div class="row g-4 justify-content-center">
-            <div class="col-6 col-md-3">
-                <div class="team-card text-center">
-                    <img src="https://ui-avatars.com/api/?name=Budi&background=4361ee&color=fff" class="team-img mb-3" alt="Foto">
-                    <h5 class="fw-bold mb-0">Muhamad Rojali</h5>
-                    <p class="text-muted small">NIM: 0110224033</p>
+            <div class="row g-4 justify-content-center">
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="team-card-modern position-relative overflow-hidden rounded-4 shadow-sm text-center">
+                        <div class="team-img-wrapper position-relative">
+                            <img src="assets/img/rojali1.jpeg" 
+                                class="img-fluid w-100 team-img" alt="Muhamad Rojali">
+                            
+                            <div class="team-overlay d-flex align-items-center justify-content-center gap-3">
+                                <a href="https://github.com/muhamadr03" target="_blank" class="social-btn bg-white text-dark"><i class="fab fa-github"></i></a>
+                                <a href="https://www.linkedin.com/in/muhamad-rojali-93b125329?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" class="social-btn bg-white text-primary"><i class="fab fa-linkedin-in"></i></a>
+                                <a href="https://www.instagram.com/mhmdrojali_27?igsh=azBtaWYxNXdxOWZ3" target="_blank" class="social-btn bg-white text-danger"><i class="fab fa-instagram"></i></a>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-white">
+                            <h5 class="fw-bold mb-1 text-dark">Muhamad Rojali</h5>
+                            <p class="text-primary small fw-bold mb-0">NIM: 0110224033</p>
+                            <p class="text-muted small mt-2 mb-0">Fullstack Developer</p>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="team-card text-center">
-                    <img src="https://ui-avatars.com/api/?name=Siti&background=3f37c9&color=fff" class="team-img mb-3" alt="Foto">
-                    <h5 class="fw-bold mb-0">Nama Anggota 2</h5>
-                    <p class="text-muted small">NIM: 123456</p>
+
+                <div class="col-md-6 col-lg-3">
+                    <div class="team-card-modern position-relative overflow-hidden rounded-4 shadow-sm text-center">
+                        <div class="team-img-wrapper position-relative">
+                            <img src="assets/img/randy.jpeg" 
+                                 class="img-fluid w-100 team-img" alt="Foto">
+                            <div class="team-overlay d-flex align-items-center justify-content-center gap-3">
+                                <a href="#" class="social-btn bg-white text-dark"><i class="fab fa-github"></i></a>
+                                <a href="#" class="social-btn bg-white text-primary"><i class="fab fa-linkedin-in"></i></a>
+                                <a href="#" class="social-btn bg-white text-danger"><i class="fab fa-instagram"></i></a>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-white">
+                            <h5 class="fw-bold mb-1 text-dark">Muhammad Randy</h5>
+                            <p class="text-primary small fw-bold mb-0">NIM: 0110224215</p>
+                            <p class="text-muted small mt-2 mb-0">UI/UX Designer</p>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="team-card text-center">
-                    <img src="https://ui-avatars.com/api/?name=Agus&background=4cc9f0&color=fff" class="team-img mb-3" alt="Foto">
-                    <h5 class="fw-bold mb-0">Nama Anggota 3</h5>
-                    <p class="text-muted small">NIM: 123456</p>
+
+                <div class="col-md-6 col-lg-3">
+                    <div class="team-card-modern position-relative overflow-hidden rounded-4 shadow-sm text-center">
+                        <div class="team-img-wrapper position-relative">
+                            <img src="https://ui-avatars.com/api/?name=Muhamad+Iqbal&background=4cc9f0&color=fff&size=512" 
+                                 class="img-fluid w-100 team-img" alt="Muhamad Iqbal">
+                            <div class="team-overlay d-flex align-items-center justify-content-center gap-3">
+                                <a href="#" class="social-btn bg-white text-dark"><i class="fab fa-github"></i></a>
+                                <a href="#" class="social-btn bg-white text-primary"><i class="fab fa-linkedin-in"></i></a>
+                                <a href="#" class="social-btn bg-white text-danger"><i class="fab fa-instagram"></i></a>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-white">
+                            <h5 class="fw-bold mb-1 text-dark">Muhamad Iqbal</h5>
+                            <p class="text-primary small fw-bold mb-0">NIM: 0110224008</p>
+                            <p class="text-muted small mt-2 mb-0">Database Admin</p>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="team-card text-center">
-                    <img src="https://ui-avatars.com/api/?name=Dewi&background=f72585&color=fff" class="team-img mb-3" alt="Foto">
-                    <h5 class="fw-bold mb-0">Nama Anggota 4</h5>
-                    <p class="text-muted small">NIM: 123456</p>
+
+                <div class="col-md-6 col-lg-3">
+                    <div class="team-card-modern position-relative overflow-hidden rounded-4 shadow-sm text-center">
+                        <div class="team-img-wrapper position-relative">
+                            <img src="assets/img/elsi.jpeg" 
+                                 class="img-fluid w-100 team-img" alt="Elsi Novitasari">
+                            <div class="team-overlay d-flex align-items-center justify-content-center gap-3">
+                                <a href="https://github.com/Elsinovitasari29" class="social-btn bg-white text-dark"><i class="fab fa-github"></i></a>
+                                <a href="https://www.linkedin.com/in/elsi-novitasari-bba160330/ " class="social-btn bg-white text-primary"><i class="fab fa-linkedin-in"></i></a>
+                                <a href="https://www.instagram.com/elsi_novitasari29?igsh=YWYzbXJwcTg4MWgx" class="social-btn bg-white text-danger"><i class="fab fa-instagram"></i></a>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-white">
+                            <h5 class="fw-bold mb-1 text-dark">Elsi Novitasari</h5>
+                            <p class="text-primary small fw-bold mb-0">NIM: 0110224026</p>
+                            <p class="text-muted small mt-2 mb-0">Frontend Dev</p>
+                        </div>
+                    </div>
                 </div>
+
             </div>
         </div>
     </section>
